@@ -6,5 +6,6 @@ reproduce the problem. Remove API keys, private code, sign-in links and personal
 data from screenshots and logs.
 
 Do not post exploitable security vulnerabilities or credentials in a public issue.
-A private vulnerability-reporting channel will be confirmed before public builds
-are published. There is no guaranteed response time or support service level.
+Use [GitHub private vulnerability reporting](https://github.com/SilkForgeAi/grid-ai/security/advisories/new)
+for security issues. Private reporting is enabled on this repository. There is
+no guaranteed response time or support service level.
