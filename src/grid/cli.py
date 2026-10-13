@@ -103,7 +103,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--persona", choices=["grid", "teacher"], default=None,
                    help="Voice for this run. 'grid' (sweary senior engineer) needs a confirmed 18+ answer; 'teacher' is clean.")
     p.add_argument("--model", default=None,
-                   help="Any LiteLLM model id for this run, e.g. anthropic/claude-opus-5-5 "
+                   help="Any LiteLLM model id for this run, e.g. provider/model-id "
                         "(uses $LLM_BASE_URL / $LLM_API_KEY if set).")
     p.add_argument("--profile", default=None, help="Saved model profile to use (see `grid models`).")
     p.add_argument("--prompted-tools", action="store_true",
@@ -251,7 +251,7 @@ def _models_command(argv: list[str]) -> int:
             profiles = store.list()
             default = store.default_name()
             if not profiles:
-                print("no saved profiles. Grid uses $LLM_MODEL, or anthropic/claude-opus-5-5 by default.")
+                print("no saved profiles. Configure a model in Grid or set $LLM_MODEL.")
                 print("add one: grid models add NAME --model PROVIDER/MODEL [--base-url URL] [--key-env VAR]")
                 return 0
             for prof in profiles:

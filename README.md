@@ -84,12 +84,13 @@ fail until you solve it.
 
 Grid works with any model [LiteLLM](https://docs.litellm.ai/docs/providers) supports: Anthropic,
 OpenAI, Gemini, DeepSeek, OpenRouter, Bedrock, Ollama, LM Studio, vLLM, or any OpenAI-compatible
-server. With nothing configured, it uses `anthropic/claude-opus-5-5` and your `ANTHROPIC_API_KEY`.
+server. Choose a provider and model in setup, or set `LLM_MODEL` and your own API key.
+The CLI fallback is `openai/gpt-5.5`; you can replace it with any supported model.
 
 ```bash
 # save profiles once
-grid models add work  --model anthropic/claude-opus-5-5 --key-env ANTHROPIC_API_KEY --default
-grid models add cheap --model anthropic/claude-sonnet-5-5
+grid models add work  --model openai/my-model --key-env OPENAI_API_KEY --default
+grid models add cheap --model openai/another-model
 grid models add local --model ollama/qwen3.6:27b --base-url http://localhost:11434
 grid models add box   --model openai/my-model --base-url http://192.168.1.20:8000/v1 --prompted-tools
 
@@ -193,7 +194,7 @@ interface in a browser for development.
   - "Undo this task" on every result card.
 - **Plugins:** a catalog (starter plugins: `python-quality`, `git-workflow`, `docs-writer`, `teach`,
   `web-fetch`), installing from a folder or git, on/off switches, and per-project scope. Plugins use
-  the **Claude Code plugin format** (`.claude-plugin/plugin.json`, `skills/`, `commands/`,
+  the **standard plugin layout** (`.plugin/plugin.json`, `skills/`, `commands/`,
   `.mcp.json`), so those plugins work as-is. You see everything a plugin adds before installing it.
   Commands show up as `/plugin:command` in the composer.
 - **Models:** saved model profiles, the default model, and a one-click compatibility test.
@@ -254,7 +255,7 @@ Exit codes: `0` verified/done · `1` error · `2` usage · `3` unverified · `4`
 ## Project instructions
 
 Grid reads, in order (later wins): `~/.grid/GRID.md`, `GRID.md` at the git root, then `GRID.md`
-in the working folder. It also picks up `AGENTS.md`, `CLAUDE.md`, `.cursorrules` and
+in the working folder. It also picks up `AGENTS.md`, `.cursorrules` and
 `.agents/skills/` through the SDK, so repos set up for other agents work unchanged.
 
 A `verify:` line sets the check Grid runs before accepting changed code as verified:
@@ -295,7 +296,7 @@ or "always allow" can bypass it. Hard-blocked categories can only be approved at
 | `confidence*.py`, `enforcement.py`, `tiers.py`, `teaching.py`, `events.py`, `config.py` | Supporting pure logic | no |
 | `cli.py` | CLI, REPL, subcommands | no (until a task runs) |
 | `server/` | The app: API + websocket (`api.py`), session bridge (`runtime.py`), projects and safe file ops, static UI | yes |
-| `plugins.py` / `plugins_builtin/` | Plugin install/enable/remove (Claude Code format), slash-command expansion, starter catalog | yes (loader) |
+| `plugins.py` / `plugins_builtin/` | Plugin install/enable/remove (standard plugin layout), slash-command expansion, starter catalog | yes (loader) |
 | `schedules.py` / `settings.py` | Cron schedules + runner; app defaults | no |
 
 ## Test

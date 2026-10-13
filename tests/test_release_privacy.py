@@ -65,7 +65,7 @@ def test_source_snapshot_excludes_private_files(name):
 @pytest.mark.parametrize('name', [
     'src/grid/models.py', 'tests/test_models.py', 'desktop/main.js',
     '.env.example', 'LICENSE', '.github/workflows/ci.yml',
-    'src/grid/plugins_builtin/teach/.claude-plugin/plugin.json',
+    'src/grid/plugins_builtin/teach/.plugin/plugin.json',
 ])
 def test_source_snapshot_includes_learning_and_build_files(name):
     assert module('prepare_source_repo').allowed(name)

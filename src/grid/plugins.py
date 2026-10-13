@@ -1,10 +1,9 @@
 """Plugins: installable bundles of skills, slash commands and MCP servers.
 
-Grid uses the Claude Code plugin layout (via the SDK's loader), so plugins
-written for Claude Code / Cowork work unchanged:
+Grid uses the SDK's standard plugin layout for skills, commands and tools:
 
     my-plugin/
-      .claude-plugin/plugin.json     {"name", "version", "description", ...}   (or .plugin/)
+      .plugin/plugin.json     {"name", "version", "description", ...}
       skills/<skill>/SKILL.md        knowledge the agent pulls in when relevant
       commands/<command>.md          slash commands: /my-plugin:command args
       .mcp.json                      MCP servers (external tools)

@@ -74,7 +74,7 @@ class GridConfig:
     enable_computer: bool = True          # use the Mac's apps (screenshot/click/type), asking per app
     condense_context: bool = True         # summarize old history on long tasks
     quick_replies: bool = True            # plain conversation answered with a short prompt (see grid.quick)
-    load_project_skills: bool = True      # AGENTS.md, CLAUDE.md, .cursorrules, .agents/skills
+    load_project_skills: bool = True      # AGENTS.md, .cursorrules, .agents/skills
     load_user_skills: bool = True         # ~/.openhands/skills
     load_plugins: bool = True             # enabled plugins (user + project scope)
 

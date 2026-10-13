@@ -27,3 +27,7 @@ available dependency license texts are packaged under `Resources/notices`.
 `lmnr-claude-code-proxy` is a transitive dependency with a proprietary license;
 public binary redistribution has not been approved. The distribution script
 fails closed until the recorded blockers have been resolved.
+
+The bundled Monaco editor keeps its upstream MIT notices. Grid renames the unused
+provider-specific icon registration to the neutral `gridAgent` identifier in the
+vendored worker bundles.

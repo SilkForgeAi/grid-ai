@@ -377,7 +377,7 @@ class GridSession:
         images = [u for u in (images or []) if isinstance(u, str) and u.startswith("data:image/")]
         if images and not self._sees_images():
             self.ui.say("[grid] This model can't see images, so Grid sent your message without them. Pick a model "
-                        "that can (Claude, GPT, Gemini) in Models to work with screenshots and pictures.")
+                        "that can (a vision-capable model) in Models to work with screenshots and pictures.")
             images = []
         self._images = images
         if images:

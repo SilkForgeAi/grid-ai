@@ -2570,7 +2570,7 @@ class PluginsView {
       .map(([k, l]) => h("button", { class: this.tab === k ? "active" : "", text: l, onclick: () => { this.tab = k; this.render(); } })));
     const body = h("div");
     this.page.replaceChildren(h("h1", { text: "Plugins" }),
-      h("p", { class: "lede", text: "Plugins add skills (know-how the agent pulls in), slash commands (/plugin:command) and MCP servers (external tools). Grid uses the Claude Code plugin format, so those plugins work here too." }),
+      h("p", { class: "lede", text: "Plugins add skills (know-how the agent pulls in), slash commands (/plugin:command) and MCP servers (external tools). Use a standard plugin folder to bring skills, commands, and tools into your workspace." }),
       tabs, body);
     if (this.tab === "installed") {
       const r = await attempt(() => GET("/api/plugins"));
@@ -2603,7 +2603,7 @@ class PluginsView {
     } else {
       const src = h("input", { type: "text", placeholder: "/path/to/plugin  or  github:owner/repo  or  https://...git" });
       body.append(h("div", { class: "panel" }, h("label", { class: "field" }, "Plugin source", src),
-        h("p", { class: "muted", text: "A folder with .claude-plugin/plugin.json (or .plugin/plugin.json) plus skills/, commands/ and/or .mcp.json. You'll see exactly what it contains before anything is installed." }),
+        h("p", { class: "muted", text: "A folder with .plugin/plugin.json plus skills/, commands/ and/or .mcp.json. You'll see exactly what it contains before anything is installed." }),
         h("button", { class: "btn primary", text: "Preview & install", onclick: async () => { if (src.value.trim() && await installFlow(src.value.trim())) { this.tab = "installed"; this.render(); } } })));
     }
   }
@@ -2640,7 +2640,7 @@ class ModelsView {
     });
     const f = {
       name: h("input", { type: "text", placeholder: "work" }),
-      model: h("input", { type: "text", placeholder: "anthropic/claude-opus-5-5  ·  ollama/qwen3.6:27b" }),
+      model: h("input", { type: "text", placeholder: "provider/model-id  ·  ollama/model-name" }),
       base_url: h("input", { type: "text", placeholder: "http://localhost:11434 (local/self-hosted only)" }),
       api_key_env: h("input", { type: "text", placeholder: "ANTHROPIC_API_KEY (the variable NAME)" }),
       prompted: h("input", { type: "checkbox" }), def: h("input", { type: "checkbox" }),
@@ -2651,7 +2651,7 @@ class ModelsView {
       h("div", { class: "callout info" }, "Now using ", h("strong", { class: "mono", text: r.current.model }), ` (${r.current.source})`),
       h("h2", { text: "Saved models" }),
       r.profiles.length ? h("table", { class: "list" }, h("thead", {}, h("tr", {}, ...["Name", "Model", "Where", "Works with Grid?", ""].map((t) => h("th", { text: t })))), h("tbody", {}, ...rows))
-        : h("div", { class: "empty", text: "No saved models. Grid uses $LLM_MODEL or anthropic/claude-opus-5-5." }),
+        : h("div", { class: "empty", text: "No saved models. Add a provider and model to get started." }),
       this.result = h("div"),
       this.keyHints = h("div"),
       h("h2", { text: "Add a model" }),

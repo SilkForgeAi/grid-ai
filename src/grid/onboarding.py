@@ -15,7 +15,7 @@ import os
 import urllib.error
 import urllib.request
 
-from grid.models import DEFAULT_MODEL, ModelProfile, check_endpoint, resolve_profile
+from grid.models import ModelProfile, check_endpoint, resolve_profile
 
 # Provider -> the environment variable LiteLLM reads its key from.
 PROVIDER_KEY_ENV = {
@@ -29,15 +29,14 @@ PROVIDER_KEY_ENV = {
     "mistral": "MISTRAL_API_KEY",
 }
 
-# What the setup screen offers. Only Claude has a pre-filled model id; for the
-# others the user types the id from the provider's model list (they change often).
+# Users choose a model ID from their provider's current model list.
 PROVIDERS = [
-    {"id": "anthropic", "label": "Claude (Anthropic)", "model": DEFAULT_MODEL, "prefix": "anthropic/",
-     "key_env": "ANTHROPIC_API_KEY", "recommended": True,
+    {"id": "anthropic", "label": "Anthropic", "model": "", "prefix": "anthropic/",
+     "key_env": "ANTHROPIC_API_KEY", "recommended": False,
      "keys_url": "https://console.anthropic.com/settings/keys",
-     "models_url": "https://docs.claude.com/en/docs/about-claude/models",
-     "blurb": "Best results with Grid's safety checks and tests. Pay as you go."},
-    {"id": "openai", "label": "OpenAI", "model": "", "prefix": "openai/", "key_env": "OPENAI_API_KEY",
+     "models_url": "https://console.anthropic.com/",
+     "blurb": "Choose a model from your provider account. Pay as you go."},
+    {"id": "openai", "label": "OpenAI", "model": "", "prefix": "openai/", "key_env": "OPENAI_API_KEY", "recommended": True,
      "keys_url": "https://platform.openai.com/api-keys", "models_url": "https://platform.openai.com/docs/models",
      "blurb": "GPT models. Type the model id from OpenAI's list."},
     {"id": "gemini", "label": "Google Gemini", "model": "", "prefix": "gemini/", "key_env": "GEMINI_API_KEY",

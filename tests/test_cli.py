@@ -108,9 +108,9 @@ def test_models_subcommands(tmp_path, monkeypatch, capsys):
     assert cli.main(["models"]) == 0
     assert "no saved profiles" in capsys.readouterr().out
     assert cli.main(["models", "add", "local", "--model", "ollama/q", "--base-url", "http://localhost:11434"]) == 0
-    assert cli.main(["models", "add", "work", "--model", "anthropic/claude-opus-5-5",
+    assert cli.main(["models", "add", "work", "--model", "anthropic/example-model",
                      "--key-env", "sk-ant-oops"]) == 2
-    assert cli.main(["models", "add", "work", "--model", "anthropic/claude-opus-5-5",
+    assert cli.main(["models", "add", "work", "--model", "anthropic/example-model",
                      "--key-env", "ANTHROPIC_API_KEY"]) == 0
     assert cli.main(["models", "use", "work"]) == 0
     capsys.readouterr()
@@ -123,7 +123,7 @@ def test_models_subcommands(tmp_path, monkeypatch, capsys):
 
 def test_local_only_refuses_cloud_model(tmp_path, monkeypatch):
     monkeypatch.setenv("GRID_HOME", str(tmp_path / "home"))
-    assert cli.main(["--local-only", "--model", "anthropic/claude-opus-5-5", "--headless", "x"]) == 2
+    assert cli.main(["--local-only", "--model", "anthropic/example-model", "--headless", "x"]) == 2
     assert cli.main(["--profile", "missing", "--headless", "x"]) == 2
 
 
@@ -135,7 +135,7 @@ def test_model_repl_command(tmp_path, monkeypatch, capsys):
     ModelStore().add(ModelProfile("local", "ollama/q"))
 
     class S:
-        config = GridConfig(model_profile=ModelProfile("cli", "anthropic/claude-opus-5-5"))
+        config = GridConfig(model_profile=ModelProfile("cli", "anthropic/example-model"))
 
         def switch_model(self, profile):
             return f"now using {profile.model}"
@@ -144,7 +144,7 @@ def test_model_repl_command(tmp_path, monkeypatch, capsys):
     cli._model_command(S(), "local")
     cli._model_command(S(), "missing")
     out = capsys.readouterr().out
-    assert "model: anthropic/claude-opus-5-5" in out and "saved profiles: local" in out
+    assert "model: anthropic/example-model" in out and "saved profiles: local" in out
     assert "now using ollama/q" in out and "no model profile 'missing'" in out
 
 

@@ -9,8 +9,8 @@ from grid.plugins import PluginError, PluginManager, builtin_catalog, expand_com
 
 def make_plugin(root, name="hello", mcp=None):
     d = root / name
-    (d / ".claude-plugin").mkdir(parents=True)
-    (d / ".claude-plugin" / "plugin.json").write_text(json.dumps({"name": name, "version": "0.1.0", "description": "hi"}))
+    (d / ".plugin").mkdir(parents=True)
+    (d / ".plugin" / "plugin.json").write_text(json.dumps({"name": name, "version": "0.1.0", "description": "hi"}))
     (d / "commands").mkdir()
     (d / "commands" / "greet.md").write_text("---\ndescription: say hi\n---\nGreet $ARGUMENTS warmly.\n")
     (d / "skills" / "manners").mkdir(parents=True)

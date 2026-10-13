@@ -26,7 +26,7 @@ def store(tmp_path):
 
 def test_add_list_default_remove(store):
     store.add(ModelProfile("local", "ollama/qwen3.6:27b", base_url="http://localhost:11434"))
-    store.add(ModelProfile("work", "anthropic/claude-opus-5-5", api_key_env="ANTHROPIC_API_KEY"))
+    store.add(ModelProfile("work", "anthropic/example-model", api_key_env="ANTHROPIC_API_KEY"))
     assert [p.name for p in store.list()] == ["local", "work"]
     assert store.default_name() == "local"          # first one becomes default
     store.set_default("work")
@@ -43,8 +43,8 @@ def test_add_list_default_remove(store):
 
 def test_keys_are_never_saved(store):
     with pytest.raises(ModelError, match="NAME of an environment variable"):
-        store.add(ModelProfile("bad", "anthropic/claude-opus-5-5", api_key_env="sk-ant-api03-abcdef"))
-    store.add(ModelProfile("ok", "anthropic/claude-opus-5-5", api_key_env="ANTHROPIC_API_KEY"))
+        store.add(ModelProfile("bad", "anthropic/example-model", api_key_env="sk-ant-api03-abcdef"))
+    store.add(ModelProfile("ok", "anthropic/example-model", api_key_env="ANTHROPIC_API_KEY"))
     text = store.path.read_text()
     assert "ANTHROPIC_API_KEY" in text and "sk-" not in text
 
@@ -63,7 +63,7 @@ def test_looks_like_secret(value, secret):
     ("openai/gpt-oss", "http://192.168.1.20:8000/v1", True),
     ("openai/gpt-oss", "http://mybox.local:8000/v1", True),
     ("openai/gpt-oss", "https://api.together.xyz/v1", False),
-    ("anthropic/claude-opus-5-5", None, False),
+    ("anthropic/example-model", None, False),
     ("hosted_vllm/qwen", "http://10.0.0.5:8000", True),
 ])
 def test_is_local_endpoint(model, url, local):
@@ -80,7 +80,7 @@ def test_validation():
 
 def test_resolution_order(store):
     store.add(ModelProfile("local", "ollama/q"))
-    store.add(ModelProfile("work", "anthropic/claude-opus-5-5"))
+    store.add(ModelProfile("work", "anthropic/example-model"))
     env = {"LLM_MODEL": "openai/gpt-5.5", "GRID_PROFILE": "work"}
     assert resolve_profile(cli_model="x/y", env=env, store=store)[0].model == "x/y"
     assert resolve_profile(cli_profile="local", env=env, store=store)[0].name == "local"
@@ -91,11 +91,11 @@ def test_resolution_order(store):
 
 
 def test_api_key_resolution():
-    p = ModelProfile("w", "anthropic/claude-opus-5-5", api_key_env="WORK_KEY")
+    p = ModelProfile("w", "anthropic/example-model", api_key_env="WORK_KEY")
     assert resolve_api_key(p, {"WORK_KEY": "k1", "LLM_API_KEY": "k2"}) == "k1"
     with pytest.raises(ModelError, match=r"\$WORK_KEY"):
         resolve_api_key(p, {"LLM_API_KEY": "k2"})
-    q = ModelProfile("q", "anthropic/claude-opus-5-5")
+    q = ModelProfile("q", "anthropic/example-model")
     assert resolve_api_key(q, {"LLM_API_KEY": "k2"}) == "k2"
     assert resolve_api_key(q, {}) is None   # LiteLLM reads ANTHROPIC_API_KEY itself
 
@@ -125,7 +125,7 @@ def test_check_endpoint_dead_and_alive():
         assert check_endpoint(alive, timeout=2) is None
     finally:
         srv.shutdown()
-    assert check_endpoint(ModelProfile("c", "anthropic/claude-opus-5-5")) is None  # cloud: not pinged
+    assert check_endpoint(ModelProfile("c", "anthropic/example-model")) is None  # cloud: not pinged
 
 
 def test_probe_verdicts():

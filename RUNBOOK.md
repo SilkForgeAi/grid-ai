@@ -22,7 +22,8 @@ pytest -q                      # some integration tests require explicit environ
 ## 3. Configure a model
 
 ```bash
-export LLM_API_KEY=sk-...          # default model: anthropic/claude-opus-5-5
+export LLM_MODEL=openai/your-model
+export LLM_API_KEY=your-key-here   # supply your own provider key
 # or
 export LLM_MODEL=ollama/qwen2.5-coder:32b LLM_BASE_URL=http://localhost:11434
 ```

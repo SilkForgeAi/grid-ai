@@ -24,7 +24,7 @@ os.environ["HOME"] = str(tmp / "home")          # Downloads etc. live in a throw
 (tmp / "home" / "Downloads").mkdir(parents=True)
 os.environ["OPENHANDS_SUPPRESS_BANNER"] = "1"
 os.environ["LOG_LEVEL"] = "WARNING"
-os.environ["ANTHROPIC_API_KEY"] = "test-key"   # so first-run setup sees a usable model
+os.environ["OPENAI_API_KEY"] = "test-key"   # so first-run setup sees a usable model
 for _v in ("LLM_MODEL", "LLM_API_KEY", "GRID_PROFILE"):
     os.environ.pop(_v, None)
 os.environ["PATH"] = os.path.dirname(sys.executable) + os.pathsep + os.environ["PATH"]

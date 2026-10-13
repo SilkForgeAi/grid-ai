@@ -39,7 +39,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-grid = ["server/static/**/*", "plugins_builtin/**/*", "plugins_builtin/*/.claude-plugin/*", "plugins_builtin/*/.mcp.json"]
+grid = ["server/static/**/*", "plugins_builtin/**/*", "plugins_builtin/*/.plugin/*", "plugins_builtin/*/.mcp.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

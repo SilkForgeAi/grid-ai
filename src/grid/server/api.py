@@ -882,7 +882,7 @@ def create_app(*, token: str, port: int, runtime: Runtime | None = None,
             raise ApiError("type the model id")
         if "/" not in model:
             model = prov["prefix"] + model
-        name = {"anthropic": "claude"}.get(prov["id"], prov["id"])
+        name = prov["id"]
         prof = ModelProfile(name=name, model=model, base_url=(b.get("base_url") or prov.get("base_url") or None),
                             api_key_env=prov.get("key_env"), note="added by first-run setup")
         ModelStore().add(prof, make_default=True, replace=True)   # new chats use it

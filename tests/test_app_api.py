@@ -413,7 +413,7 @@ def test_first_run_setup(env, monkeypatch):
     monkeypatch.delenv("GRID_PROFILE", raising=False)
     st = client.get("/api/setup").json()
     assert st["ready"] is False and st["chosen"] is False and st["done"] is False
-    assert st["key_env"] == "ANTHROPIC_API_KEY" and any(p["recommended"] for p in st["providers"] if p.get("recommended"))
+    assert st["key_env"] == "OPENAI_API_KEY" and any(p["recommended"] for p in st["providers"] if p.get("recommended"))
     assert client.post("/api/setup/choose", json={"provider": "openai"}, headers=H).status_code == 400   # needs a model id
     st = client.post("/api/setup/choose", json={"provider": "openai", "model": "some-model"}, headers=H).json()
     assert st["model"] == "openai/some-model" and st["key_env"] == "OPENAI_API_KEY" and st["chosen"] and not st["ready"]

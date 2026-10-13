@@ -56,7 +56,7 @@ def load_instructions(workspace: str | os.PathLike) -> str:
     """Layered instructions, most general first so the most specific wins:
     ~/.grid/GRID.md (global) -> <git root>/GRID.md -> <workspace>/GRID.md.
 
-    AGENTS.md / CLAUDE.md / .cursorrules are loaded separately through the
+    AGENTS.md / .cursorrules are loaded separately through the
     SDK's project skills, so repos written for other agents work as-is.
     """
     ws = Path(os.path.realpath(os.fspath(workspace)))

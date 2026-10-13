@@ -1,7 +1,7 @@
 """Bring your own model: saved model profiles, key handling, local-only checks.
 
     grid models add local --model ollama/qwen3.6:27b --base-url http://localhost:11434
-    grid models add work  --model anthropic/claude-opus-5-5 --key-env ANTHROPIC_API_KEY
+    grid models add work  --model anthropic/example-model --key-env ANTHROPIC_API_KEY
     grid models use work            # make it the default
     grid --profile local "task"     # or pick per run
 
@@ -29,7 +29,7 @@ from urllib.parse import urlparse
 from grid.project import grid_home
 
 # Anthropic's recommended model for long-running agentic coding (Oct 2026).
-DEFAULT_MODEL = "anthropic/claude-opus-5-5"
+DEFAULT_MODEL = "openai/gpt-5.5"
 
 # Providers that, with no base_url, talk to a server on this machine.
 _LOCAL_PROVIDERS = {"ollama", "ollama_chat", "lm_studio", "llamafile"}
@@ -66,7 +66,7 @@ class ModelProfile:
         if not _NAME_RE.match(self.name):
             raise ModelError(f"bad profile name {self.name!r}: letters, digits, . _ - only")
         if not self.model or " " in self.model:
-            raise ModelError(f"bad model id {self.model!r} (expected a litellm id like anthropic/claude-opus-5-5)")
+            raise ModelError(f"bad model id {self.model!r} (expected a litellm id like provider/model-id)")
         if self.api_key_env is not None:
             if looks_like_secret(self.api_key_env) or not _ENV_NAME_RE.match(self.api_key_env):
                 raise ModelError(

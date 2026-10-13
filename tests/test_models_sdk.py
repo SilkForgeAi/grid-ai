@@ -38,7 +38,7 @@ def test_build_llm_from_profile_sets_fields(monkeypatch):
 
 
 def test_effective_profile_local_only_and_prompted_tools():
-    cloud = GridConfig(model_profile=ModelProfile("c", "anthropic/claude-opus-5-5"), local_only=True)
+    cloud = GridConfig(model_profile=ModelProfile("c", "anthropic/example-model"), local_only=True)
     with pytest.raises(ModelError, match="off this machine"):
         effective_profile(cloud)
     local = GridConfig(model_profile=ModelProfile("l", "ollama/q"), local_only=True, prompted_tools=True)
@@ -109,7 +109,7 @@ def test_switch_model_mid_session(tmp_path, monkeypatch):
     assert llm.litellm_extra_body["options"]["num_ctx"] >= 8192 and llm.litellm_extra_body["keep_alive"]
     sess.config.local_only = True
     with pytest.raises(ModelError):
-        sess.switch_model(ModelProfile("c", "anthropic/claude-opus-5-5"))
+        sess.switch_model(ModelProfile("c", "anthropic/example-model"))
 
 
 def test_session_files_never_contain_the_key(tmp_path, monkeypatch):
