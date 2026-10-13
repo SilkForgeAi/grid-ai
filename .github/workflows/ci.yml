@@ -40,7 +40,7 @@ jobs:
   ui:
     runs-on: ubuntu-latest
     env:
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/grid-playwright
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/grid-playwright
       OPENHANDS_SUPPRESS_BANNER: "1"
       LOG_LEVEL: WARNING
     steps:
