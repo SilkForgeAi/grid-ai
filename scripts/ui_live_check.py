@@ -17,6 +17,9 @@ import threading
 import time
 from pathlib import Path
 
+from browser_cache import preserve_browser_cache
+
+preserve_browser_cache(os.environ, sys.platform)
 tmp = Path(tempfile.mkdtemp())
 os.environ["GRID_HOME"] = str(tmp / "gridhome")
 os.environ["HOME"] = str(tmp / "home")

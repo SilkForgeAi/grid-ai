@@ -18,6 +18,9 @@ import threading
 import time
 from pathlib import Path
 
+from browser_cache import preserve_browser_cache
+
+preserve_browser_cache(os.environ, sys.platform)
 tmp = Path(tempfile.mkdtemp())
 os.environ["GRID_HOME"] = str(tmp / "gridhome")
 os.environ["HOME"] = str(tmp / "home")          # Downloads etc. live in a throwaway home
@@ -60,12 +63,15 @@ SCRIPT = [
          thought="add() subtracts; it should add."),
     turn("terminal", {"command": PY}, thought="Confirm the fix."),
     turn("finish", {"message": "Fixed **add**: it subtracted instead of adding. Tests pass."}),
+    turn("file_editor", {"command": "view", "path": str(proj / "calc.py")}, thought="Review the change."),
+    turn("finish", {"message": "Fixed add. REVIEW: checked addition and its test; no issues found."}),
     turn("terminal", {"command": "rm -rf build"}, thought="Clean the build folder."),
     turn("finish", {"message": "Okay, I left the build folder alone."}),
 ]
 runtime = Runtime(llm_factory=lambda: TestLLM.from_messages(list(SCRIPT)), persist=False,
                   config_factory=lambda: GridConfig(condense_context=False, load_user_skills=False))
 PORT, TOKEN = 8799, "uitoken"
+MOD = "Meta" if sys.platform == "darwin" else "Control"
 server = uvicorn.Server(uvicorn.Config(create_app(token=TOKEN, port=PORT, runtime=runtime),
                                        host="127.0.0.1", port=PORT, log_level="warning"))
 threading.Thread(target=server.run, daemon=True).start()
@@ -81,7 +87,7 @@ with sync_playwright() as pw:
     page.on("console", lambda m: errors.append(f"console {m.type}: {m.text}") if m.type == "error" else None)
     page.on("pageerror", lambda e: errors.append(f"pageerror: {e}"))
     page.goto(f"http://127.0.0.1:{PORT}/?token={TOKEN}")
-    expect(page.get_by_role("heading", name="Grid")).to_be_visible()
+    expect(page.get_by_role("heading", name="Grid", exact=True, level=1)).to_be_visible()
     page.screenshot(path=shots / "01-home.png")
     # first run: the 18+ question decides Grid's personality
     expect(page.locator(".modal")).to_contain_text("Are you 18 or older?")
@@ -92,8 +98,9 @@ with sync_playwright() as pw:
     page.get_by_role("button", name="New project").first.click()
     page.get_by_label("Name").fill("calc")
     page.get_by_role("button", name="Create").click()
+    page.get_by_role("button", name="Files", exact=True).click()
     expect(page.locator(".files .pane-head .title")).to_contain_text("calc")
-    expect(page.locator(".welcome h2")).to_contain_text("building - or breaking")
+    expect(page.locator(".welcome h2")).to_contain_text("What will you try in calc?")
     (proj / "calc.py").write_text("def add(a, b):\n    return a - b\n")
     (proj / "test_calc.py").write_text("from calc import add\n\n\ndef test_add():\n    assert add(2, 3) == 5\n")
     page.get_by_title("Refresh").click()
@@ -109,7 +116,7 @@ with sync_playwright() as pw:
     page.screenshot(path=shots / "02-workspace.png")
     # Cmd/Ctrl+K opens the inline edit box on the current line
     page.locator(".ehost .monaco-editor .view-lines").click()
-    page.keyboard.press("Control+k")
+    page.keyboard.press(f"{MOD}+k")
     expect(page.locator(".inline-edit")).to_be_visible()
     page.keyboard.press("Escape")
 
@@ -146,14 +153,15 @@ with sync_playwright() as pw:
     expect(page.locator(".act.rejected")).to_be_visible()
     assert page.locator(".outcome").count() == 1
 
+    page.get_by_role("button", name="02Code").click()
     page.locator(".ins-tabs button", has_text="Checkpoints").click()
     expect(page.locator(".cp").first).to_be_visible()
-    # switch to the chat layout and back
-    page.get_by_role("button", name="Chat view").click()
-    expect(page.locator(".ws.mode-chat .stream .outcome").first).to_be_visible()
+    # Focus the guide, then return to the code without losing the task.
+    page.get_by_role("button", name="03Understand").click()
+    expect(page.locator(".workshop[data-workshop=understand] .stream .outcome").first).to_be_visible()
     page.screenshot(path=shots / "05b-chat-layout.png")
-    page.get_by_role("button", name="Editor view").click()
-    expect(page.locator(".ws.mode-editor")).to_be_visible()
+    page.get_by_role("button", name="02Code").click()
+    expect(page.locator(".workshop[data-workshop=code]")).to_be_visible()
     page.screenshot(path=shots / "05-checkpoints.png")
     page.locator(".outcome").first.get_by_role("button", name="Undo this task").click()
     page.locator(".modal").get_by_role("button", name="Undo").click()
@@ -167,7 +175,7 @@ with sync_playwright() as pw:
     assert (proj / "src" / "utils").is_dir()
 
     # quick open: fuzzy file match + :line
-    page.keyboard.press("Control+p")
+    page.keyboard.press(f"{MOD}+p")
     expect(page.locator(".palette")).to_be_visible()
     page.keyboard.type("tcalc:4")
     expect(page.locator(".pitem.sel")).to_contain_text("test_calc.py")
@@ -177,12 +185,12 @@ with sync_playwright() as pw:
     expect(page.locator(".etab.active")).to_contain_text("test_calc.py")
     page.wait_for_function("() => monaco.editor.getEditors().some(e => e.getModel()?.uri.path.endsWith('/test_calc.py') && e.getPosition().lineNumber === 4)")
     # command palette
-    page.keyboard.press("Control+Shift+p")
+    page.keyboard.press(f"{MOD}+Shift+p")
     page.keyboard.type("checkpoints")
     page.keyboard.press("Enter")
     expect(page.locator(".ins-tabs button.active")).to_have_text("Checkpoints")
     # search + replace across files
-    page.keyboard.press("Control+Shift+f")
+    page.keyboard.press(f"{MOD}+Shift+f")
     expect(page.locator(".search-pane")).to_be_visible()
     page.get_by_label("Search in project").fill("add")
     expect(page.locator(".search-pane .sstatus")).to_contain_text("results in 3 files")   # GRID.md says "Add"
@@ -252,6 +260,7 @@ with sync_playwright() as pw:
     expect(page.locator("html")).to_have_attribute("data-theme", "dark")
     page.locator("#project-list a", has_text="calc").click()
     expect(page.locator(".outcome").first).to_be_visible()
+    page.get_by_role("button", name="Files", exact=True).click()
     page.locator(".tree .node", has_text="calc.py").first.click()
     page.wait_for_function("() => document.querySelector('.ehost .monaco-editor')?.classList.contains('vs-dark')")
     page.screenshot(path=shots / "11-dark.png")
@@ -266,7 +275,7 @@ with sync_playwright() as pw:
     page.locator("#project-list a", has_text="calc").click()
     page.get_by_title("Autonomous mode").click()          # back to asking first (it was on from earlier)
     expect(page.get_by_title("Autonomous mode")).to_have_attribute("aria-pressed", "false")
-    page.get_by_role("button", name="New chat").click()
+    page.get_by_role("button", name="New chat").first.click()
     shot = tmp / "shot.png"
     from PIL import Image
 
@@ -320,6 +329,7 @@ with sync_playwright() as pw:
     page.locator(".setup").get_by_role("button", name="Change model").click()
     page.locator(".pcard", has_text="OpenAI").click()
     page.get_by_label("Model id").fill("test-model")
+    os.environ.pop("OPENAI_API_KEY", None)
     page.screenshot(path=shots / "12-setup-choose.png")
     page.locator(".setup").get_by_role("button", name="Continue").click()
     expect(page.locator(".setup .codebox")).to_contain_text("export OPENAI_API_KEY=")
@@ -327,7 +337,7 @@ with sync_playwright() as pw:
     page.keyboard.press("Escape")
     # with no key for the chosen model, sending a task opens setup instead of failing
     page.locator("#project-list a", has_text="calc").click()
-    page.get_by_role("button", name="New chat").click()
+    page.get_by_role("button", name="New chat").first.click()
     expect(page.locator(".setup-nudge")).to_be_visible()
     page.get_by_label("Message Grid").fill("hello")
     page.keyboard.press("Enter")

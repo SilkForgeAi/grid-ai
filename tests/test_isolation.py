@@ -146,6 +146,8 @@ def test_real_sdk_restricted_edit_and_verification(tmp_path, monkeypatch):
         ),
         turn(2, "terminal", {"command": "python -m pytest -q -p no:cacheprovider"}),
         turn(3, "finish", {"message": "Fixed."}),
+        turn(4, "file_editor", {"command": "view", "path": str(ws / "calc.py")}),
+        turn(5, "finish", {"message": "Fixed. REVIEW: checked addition and its test; no issues found."}),
     ]
     config = GridConfig(condense_context=False, verify_command="python -m pytest -q -p no:cacheprovider")
     session = GridSession(
@@ -155,6 +157,8 @@ def test_real_sdk_restricted_edit_and_verification(tmp_path, monkeypatch):
         report = session.submit("Fix addition")
         assert report.outcome is Outcome.VERIFIED, report
         assert "a + b" in (ws / "calc.py").read_text()
+        assert session._reviewed is True
+        assert "REVIEW:" in report.message
         assert session.config.enable_memory is False
         tools = {tool.name for tool in session.conversation.state.agent.tools}
         assert tools == {"grid_isolated_terminal", "grid_isolated_editor"}
