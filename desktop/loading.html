@@ -1,0 +1,11 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Grid</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self'">
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; height: 100vh; display: grid; place-items: center; font: 14px system-ui, -apple-system, sans-serif; color: #8b97a8; -webkit-app-region: drag;
+    background: radial-gradient(800px 480px at 0% -10%, rgba(45,212,191,.10), transparent 60%), linear-gradient(rgba(148,163,184,.045) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(90deg, rgba(148,163,184,.045) 1px, transparent 1px) 0 0/28px 28px, #07090d; }
+  img { filter: drop-shadow(0 6px 24px rgba(45,212,191,.45)); }
+  .box { text-align: center; } img { width: 72px; height: 72px; animation: p 1.6s ease-in-out infinite; } @keyframes p { 50% { opacity: .55; transform: scale(.96); } }
+</style></head>
+<body><div class="box"><img src="build/icon.png" alt=""><p>Starting Grid&hellip;</p></div></body></html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grid AI</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#151a21; --panel2:#1b222b; --line:#232c37;
+    --text:#e6edf3; --muted:#8b98a8; --faint:#5b6675;
+    --green:#3fb950; --greenbg:#1c3327; --yellow:#d9a441; --yellowbg:#33290f;
+    --red:#f0603a; --redbg:#3a1a12; --accent:#6c8cff; --accentbg:#1a2140;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text);
+    height:100vh;overflow:hidden;font-size:14px;-webkit-font-smoothing:antialiased}
+  .app{display:grid;grid-template-rows:44px 1fr;height:100vh}
+  /* top bar */
+  .topbar{display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.2px}
+  .logo .mark{width:20px;height:20px;border-radius:5px;background:
+    conic-gradient(from 45deg,#6c8cff,#3fb950,#d9a441,#6c8cff);display:inline-block}
+  .crumb{color:var(--muted)}
+  .crumb b{color:var(--text);font-weight:500}
+  .spacer{flex:1}
+  .pill{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:3px 10px;display:flex;gap:6px;align-items:center}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
+  /* body grid */
+  .cols{display:grid;grid-template-columns:230px 1fr 300px;height:100%;min-height:0}
+  .side{background:var(--panel);border-right:1px solid var(--line);overflow:auto}
+  .right{background:var(--panel);border-left:1px solid var(--line);overflow:auto}
+  .center{display:grid;grid-template-rows:1fr auto;min-height:0}
+  .sec{padding:14px;border-bottom:1px solid var(--line)}
+  .sec h3{margin:0 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);font-weight:600}
+  /* depth dial */
+  .seg{display:flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--muted);padding:6px 4px;border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--sans)}
+  .seg button.on{background:var(--accentbg);color:#aebbff}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;color:var(--muted);font-size:12px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .lesson{font-size:12px;color:var(--muted);background:var(--panel2);border-left:2px solid var(--yellow);padding:8px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;line-height:1.5}
+  .lesson b{color:var(--text);font-weight:500}
+  .memempty{font-size:12px;color:var(--faint);font-style:italic}
+  /* conversation / terminal */
+  .stream{overflow:auto;padding:16px 18px}
+  .msg{margin-bottom:14px;max-width:92%}
+  .msg.user{margin-left:auto}
+  .bubble{padding:9px 12px;border-radius:10px;line-height:1.55}
+  .user .bubble{background:var(--accentbg);color:#dfe6ff}
+  .agent .bubble{background:var(--panel2)}
+  .who{font-size:11px;color:var(--faint);margin:0 4px 4px}
+  .user .who{text-align:right}
+  .plan{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px;background:var(--panel2)}
+  .plan h4{margin:0 0 8px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .plan ol{margin:0;padding-left:18px;color:var(--text);line-height:1.7}
+  .plan .approve{display:flex;gap:8px;margin-top:10px}
+  .term{font-family:var(--mono);font-size:12.5px;background:#0a0d11;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.6;white-space:pre-wrap;overflow:auto}
+  .term .cmd{color:#9fb4ff}
+  .term .ok{color:var(--green)}
+  .term .fail{color:var(--red)}
+  .term .dim{color:var(--faint)}
+  .action{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .action .label{color:var(--muted);font-size:13px}
+  .badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+  .b-green{background:var(--greenbg);color:#6fd98a}
+  .b-yellow{background:var(--yellowbg);color:#e6bd6a}
+  .b-red{background:var(--redbg);color:#ff8a6a}
+  .teach{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;background:#121a2e;padding:10px 13px;margin-bottom:14px;line-height:1.6}
+  .teach .t-h{font-size:11px;color:#8ea2ff;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
+  /* composer */
+  .composer{border-top:1px solid var(--line);padding:12px 14px;background:var(--panel);display:flex;gap:10px;align-items:flex-end}
+  .composer textarea{flex:1;resize:none;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-family:var(--sans);font-size:14px;height:42px;line-height:1.4}
+  .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:9px 14px;cursor:pointer;font-size:13px;font-family:var(--sans)}
+  .btn:hover{border-color:var(--faint)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#0b1020;font-weight:500}
+  .btn.ghost{background:transparent}
+  .btn.danger{color:#ff8a6a}
+  .btn.mini{padding:5px 10px;font-size:12px}
+  /* timeline */
+  .step{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:default}
+  .step .ic{width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--panel2);color:var(--muted);margin-top:1px}
+  .step .ic.ok{background:var(--greenbg);color:var(--green)}
+  .step .ic.edit{background:var(--accentbg);color:#8ea2ff}
+  .step .ic.warn{background:var(--yellowbg);color:var(--yellow)}
+  .step .tx{font-size:12.5px;line-height:1.4}
+  .step .tx small{color:var(--faint);display:block;font-size:11px;margin-top:2px}
+  .step .undo{margin-left:auto;color:var(--faint);font-size:11px;cursor:pointer;align-self:center}
+  .step .undo:hover{color:var(--red)}
+  .diff{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:4px}
+  .diff div{padding:2px 10px;white-space:pre}
+  .diff .del{background:var(--redbg);color:#ffb3a0}
+  .diff .add{background:var(--greenbg);color:#8fe6a4}
+  .diff .ctx{color:var(--faint)}
+  /* modal */
+  .scrim{position:absolute;inset:0;background:rgba(3,6,10,.6);display:none;align-items:center;justify-content:center;z-index:20}
+  .scrim.show{display:flex}
+  .modal{width:440px;background:var(--panel);border:1px solid var(--red);border-radius:14px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .modal h3{margin:0 0 6px;display:flex;align-items:center;gap:8px}
+  .modal .rtag{font-size:11px;background:var(--redbg);color:#ff8a6a;padding:2px 8px;border-radius:20px}
+  .modal p{color:var(--muted);line-height:1.6;margin:8px 0}
+  .modal code{font-family:var(--mono);background:#0a0d11;color:#ffb3a0;padding:8px 10px;border-radius:6px;display:block;margin:10px 0}
+  .modal .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+  .hidden{display:none}
+  .cursor::after{content:"▋";color:var(--muted);animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#2a333f;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo"><span class="mark"></span> Grid AI</div>
+    <div class="crumb">project&nbsp; <b>demo_failing_test</b></div>
+    <div class="spacer"></div>
+    <div class="pill">qwen2.5-coder:32b · local</div>
+    <div class="pill"><span class="dot"></span> autonomy: risk-gated</div>
+  </div>
+
+  <div class="cols">
+    <!-- LEFT -->
+    <aside class="side">
+      <div class="sec">
+        <h3>Teaching depth</h3>
+        <div class="seg" id="depth">
+          <button data-d="beginner" class="on">Beginner</button>
+          <button data-d="intermediate">Interm.</button>
+          <button data-d="pro">Pro</button>
+        </div>
+      </div>
+      <div class="sec">
+        <h3>Autonomy</h3>
+        <div class="row"><span>Confidence threshold</span><span id="ctv">0.60</span></div>
+        <input type="range" id="ct" min="0" max="1" step="0.05" value="0.6">
+        <div class="row" style="margin-top:12px"><span>Step budget</span><span>25</span></div>
+        <div style="font-size:11px;color:var(--faint);line-height:1.5;margin-top:8px">
+          Green runs freely · Yellow soft-confirms · Red always stops. Low confidence bumps an action up a level.
+        </div>
+      </div>
+      <div class="sec">
+        <h3>Memory · this project</h3>
+        <div id="mem">
+          <div class="lesson"><b>forgot to await async fetch()</b><br>fetch() returns a coroutine — await it or you get a coroutine object.</div>
+          <div class="memempty" id="memnew" style="display:none"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER -->
+    <section class="center">
+      <div class="stream" id="stream">
+        <div class="msg agent"><div class="who">Grid AI</div><div class="bubble">
+          Hi — I'm Grid AI. Point me at a task and I'll work in my own terminal, explain what I'm doing as I go, and stop to ask before anything risky. Try <b>Run the demo</b> below, or type a task.
+        </div></div>
+      </div>
+      <div class="composer">
+        <textarea id="input" placeholder="Ask Grid to build, fix, or explain something…"></textarea>
+        <button class="btn ghost" id="risky" title="See the red gate">Risky cmd</button>
+        <button class="btn primary" id="run">Run the demo</button>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="right">
+      <div class="sec">
+        <h3>Checkpoints · undo timeline</h3>
+        <div id="timeline">
+          <div class="step"><span class="ic">•</span><div class="tx">Session started<small>every step below is reversible</small></div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <h3>Working diff</h3>
+        <div id="diffbox" style="color:var(--faint);font-size:12px">No changes yet.</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- RED confirmation -->
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <h3><span class="rtag">RED · stop &amp; ask</span></h3>
+    <p>Grid wants to run a <b>destructive</b> command. This is irreversible and outside what it can do on its own — your call:</p>
+    <code id="riskcmd">rm -rf ./demo_failing_test</code>
+    <p style="font-size:12px">Even at high confidence, red actions never auto-run.</p>
+    <div class="acts">
+      <button class="btn ghost" id="deny">Don't run</button>
+      <button class="btn danger" id="approve">Run it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), stream=$("#stream"), tl=$("#timeline");
+let depth="beginner", threshold=0.6;
+
+$("#depth").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  [...$("#depth").children].forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); depth=b.dataset.d;
+});
+$("#ct").addEventListener("input",e=>{threshold=+e.target.value; $("#ctv").textContent=(+e.target.value).toFixed(2);});
+
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function scroll(){stream.scrollTop=stream.scrollHeight;}
+function el(html){const d=document.createElement("div");d.innerHTML=html.trim();return d.firstChild;}
+function add(node){stream.appendChild(node);scroll();return node;}
+
+function userMsg(t){add(el(`<div class="msg user"><div class="who">You</div><div class="bubble">${t}</div></div>`));}
+function agentMsg(t){return add(el(`<div class="msg agent"><div class="who">Grid AI</div><div class="bubble">${t}</div></div>`));}
+async function type(node,text,sp=14){node.classList.add("cursor");for(let i=0;i<text.length;i++){node.textContent=text.slice(0,i+1);if(i%2===0)scroll();await wait(sp);}node.classList.remove("cursor");}
+
+function checkpoint(kind,title,sub){
+  const ic={ok:"ok",edit:"edit",warn:"warn"}[kind]||"";
+  const g={ok:"✓",edit:"✎",warn:"!"}[kind]||"•";
+  tl.appendChild(el(`<div class="step"><span class="ic ${ic}">${g}</span><div class="tx">${title}<small>${sub||""}</small></div><span class="undo">undo</span></div>`));
+}
+
+const badge=(cls,txt)=>`<span class="badge ${cls}">${txt}</span>`;
+
+async function demo(){
+  $("#run").disabled=true; $("#run").textContent="Running…";
+  userMsg("The test in this folder is failing. Make it pass.");
+  await wait(500);
+
+  // plan + approval (shown, auto-approved for the demo)
+  const plan=add(el(`<div class="plan"><h4>Plan · approve before I touch anything</h4>
+    <ol><li>Run the test suite to see the failure</li><li>Read the error and locate the bug</li><li>Explain why it broke, then fix it</li><li>Re-run to confirm green</li></ol>
+    <div class="approve"><button class="btn mini primary">Approve</button><button class="btn mini ghost">Edit plan</button></div></div>`));
+  await wait(700);
+
+  // run tests (fail) — GREEN action
+  add(el(`<div class="action"><span class="label">run tests</span>${badge("b-green","94% sure · GREEN · ran freely")}</div>`));
+  const t1=add(el(`<div class="term"></div>`));
+  t1.innerHTML=`<span class="cmd">$ pytest -q</span>\n`;
+  await wait(400);
+  t1.innerHTML+=`<span class="dim">collected 1 item</span>\n\n`;await wait(300);
+  t1.innerHTML+=`<span class="fail">F</span>  test_buggy.py::test_add\n`;await wait(300);
+  t1.innerHTML+=`<span class="fail">E   assert -1 == 5</span>\n<span class="dim">1 failed in 0.01s</span>`;
+  scroll();
+  checkpoint("ok","Ran pytest","1 failed — captured baseline");
+  await wait(600);
+
+  // teaching explanation
+  const teach=add(el(`<div class="teach"><div class="t-h">Why this broke · beginner</div><span></span></div>`));
+  await type(teach.querySelector("span"),
+    "The test expects add(2, 3) to be 5, but it got -1. That's the classic sign of a wrong operator: the function is subtracting (2 - 3 = -1) where it should add. The fix is one character — swap the minus for a plus.",12);
+  await wait(500);
+
+  // edit file (GREEN, high confidence) + diff
+  add(el(`<div class="action"><span class="label">edit buggy.py</span>${badge("b-green","91% sure · GREEN · ran freely")}</div>`));
+  $("#diffbox").innerHTML=`<div class="diff"><div class="ctx">def add(a, b):</div><div class="del">-    return a - b</div><div class="add">+    return a + b</div></div>`;
+  checkpoint("edit","Edited buggy.py","1 line · a - b → a + b");
+  await wait(700);
+
+  // rerun (pass)
+  add(el(`<div class="action"><span class="label">re-run tests</span>${badge("b-green","96% sure · GREEN · ran freely")}</div>`));
+  const t2=add(el(`<div class="term"><span class="cmd">$ pytest -q</span>\n</div>`));
+  await wait(500);
+  t2.innerHTML+=`<span class="ok">.</span>  test_buggy.py::test_add\n<span class="ok">1 passed in 0.01s</span>`;scroll();
+  checkpoint("ok","Re-ran pytest","1 passed — verified green ✓");
+  await wait(500);
+
+  agentMsg("Done — the test passes. The bug was <b>a - b</b> instead of <b>a + b</b> in <b>add()</b>. Everything I changed is a checkpoint on the right; click <b>undo</b> to roll back any step.");
+
+  $("#run").disabled=false; $("#run").textContent="Replay demo";
+}
+$("#run").addEventListener("click",demo);
+
+// risky command → RED gate
+$("#risky").addEventListener("click",()=>{
+  userMsg("clean this folder out with rm -rf and start fresh");
+  setTimeout(()=>{
+    add(el(`<div class="action"><span class="label">delete folder</span>${badge("b-red","RED · destructive · will not auto-run")}</div>`));
+    $("#scrim").classList.add("show");
+  },400);
+});
+$("#deny").addEventListener("click",()=>{
+  $("#scrim").classList.remove("show");
+  agentMsg("Understood — I won't run that. Nothing was deleted. Want me to do something safer instead?");
+});
+$("#approve").addEventListener("click",()=>{
+  $("#scrim").classList.remove("show");
+  agentMsg("Okay — since you approved it explicitly, I'd proceed. (In this preview nothing actually runs.)");
+  checkpoint("warn","Destructive command approved","rm -rf · required your ok");
+});
+
+// let the composer send a (mock) message
+$("#input").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();const v=e.target.value.trim();if(!v)return;
+    userMsg(v);e.target.value="";
+    setTimeout(()=>agentMsg("This is a UI preview — the live agent runs on your machine (see RUNBOOK.md). Hit <b>Run the demo</b> to watch a full session."),400);}
+});
+</script>
+</body>
+</html>

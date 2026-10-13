@@ -1,0 +1,13 @@
+{
+  "approved": false,
+  "blockers": [
+    "Resolve redistribution rights or replace lmnr-claude-code-proxy 0.1.24 (LicenseRef-Proprietary).",
+    "Complete LGPL source/modification obligations review for func_timeout 4.3.5.",
+    "Install valid macOS Developer ID signing credentials and complete notarization.",
+    "Complete and test the Windows engine port, installer, and signing on Windows.",
+    "Complete independent safety review and broader adversarial policy evaluation."
+  ],
+  "owner_choice": "Publish Grid-owned source under MIT; keep credentials, personal state, model weights and private development history out of the public snapshot.",
+  "public_repository": "SilkForgeAi/grid-ai",
+  "source_upload_authorized": true
+}

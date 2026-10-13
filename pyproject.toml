@@ -1,0 +1,54 @@
+[project]
+name = "grid-ai"
+version = "0.2.0"
+description = "Grid AI — a self-correcting, teaching-first personal coding agent built on openhands-sdk."
+readme = "README.md"
+requires-python = ">=3.12"  # openhands-sdk requires >=3.12
+license = { text = "MIT" }
+authors = [{ name = "Grid AI" }]
+
+# The engine. Grid AI depends on the SDK rather than forking it (see roadmap §2).
+dependencies = [
+    "uvicorn>=0.30",
+    "starlette>=0.40",
+    "websockets>=12",
+    "openhands-sdk==1.54.0",
+    "openhands-tools==1.54.0",
+    "pydantic>=2.7",
+    "httpx>=0.27",
+    "beautifulsoup4>=4.12",
+    "reportlab>=4.0",
+    "python-docx>=1.1",
+    "pypdf>=4.0",
+    "openpyxl>=3.1",
+    "python-pptx>=1.0",
+    "pillow>=10",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+grid = "grid.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+grid = ["server/static/**/*", "plugins_builtin/**/*", "plugins_builtin/*/.claude-plugin/*", "plugins_builtin/*/.mcp.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::UserWarning:pydantic.*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "B008", "UP007", "UP042"]  # UP042: keep (str, Enum) for 3.10 readers

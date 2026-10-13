@@ -1,0 +1,110 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+        os: [ubuntu-latest, macos-latest]
+    env:
+      OPENHANDS_SUPPRESS_BANNER: "1"
+      LOG_LEVEL: WARNING
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install tmux (SDK terminal tool)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y tmux
+      - name: Install tmux on macOS
+        if: runner.os == 'macOS'
+        run: brew install tmux
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check src tests
+      - name: Scan for accidental credentials
+        run: python scripts/release/scan_secrets.py
+      - name: Test (unit + scripted end-to-end, no model needed)
+        run: pytest -q
+
+  ui:
+    runs-on: ubuntu-latest
+    env:
+      OPENHANDS_SUPPRESS_BANNER: "1"
+      LOG_LEVEL: WARNING
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y tmux
+      - run: pip install -e ".[dev]" playwright && playwright install --with-deps chromium
+      - name: Browser smoke test (scripted model)
+        run: python scripts/ui_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-shots
+          path: ui-shots
+
+  desktop:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - name: Install desktop build tools
+        working-directory: desktop
+        run: npm ci --no-audit --no-fund
+      - name: Build engine bundle
+        working-directory: desktop
+        run: bash build/bundle_engine.sh arm64
+      - name: Package desktop prerelease
+        working-directory: desktop
+        run: npm run package:mac
+      - name: Check packaged contents
+        run: python scripts/release/check_desktop.py dist/Grid-darwin-arm64/Grid.app
+      - name: Syntax checks
+        run: |
+          node --test desktop/engine-bundle.test.cjs
+          node --check desktop/main.js
+          node --check desktop/preload.js
+          node --check desktop/sign-mac.cjs
+          bash -n desktop/release-mac.sh
+      # Packaging validation only: dependency redistribution review is unresolved.
+      # Do not publish desktop artifacts from this source-preview workflow.
+
+  isolation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: docker build -t grid-sandbox:local sandbox
+      - name: Real container boundary and SDK integration tests
+        env:
+          GRID_TEST_DOCKER: "1"
+        run: pytest -q tests/test_isolation.py tests/test_moderation.py tests/test_policy_service.py

@@ -1,0 +1,5 @@
+# Preserve third-party license texts verbatim, including original whitespace.
+desktop/notices/** -whitespace
+
+# Preserve upstream generated editor assets verbatim.
+src/grid/server/static/vendor/** -whitespace

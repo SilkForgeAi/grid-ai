@@ -1,0 +1,1 @@
+{"name": "git-workflow", "version": "1.0.0", "description": "Review uncommitted changes and draft commit messages (read-only: it never commits or pushes).", "author": "Grid AI"}

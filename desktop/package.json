@@ -1,0 +1,21 @@
+{
+  "name": "grid-desktop",
+  "productName": "Grid",
+  "version": "0.2.0",
+  "description": "Grid - a coding workspace with checks and review. Desktop app.",
+  "main": "main.js",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "icon": "python3 build/make_icon.py",
+    "package:mac": "electron-packager . Grid --platform=darwin --asar --arch=arm64 --icon=build/icon.icns --app-bundle-id=ai.grid.desktop --app-category-type=public.app-category.developer-tools --out=../dist --overwrite --prune=true --extra-resource=engine --extra-resource=notices --extra-resource=../THIRD_PARTY_NOTICES.md --extra-resource=../LICENSE --extra-resource=../SAFETY.md --extend-info=build/extra-info.plist --ignore='^/build/make_icon.py$' --ignore='^/build/bundle_engine.sh$' --ignore='^/build/extra-info.plist$' --ignore='^/engine($|/)'",
+    "package:mac-intel": "electron-packager . Grid --platform=darwin --asar --arch=x64 --icon=build/icon.icns --app-bundle-id=ai.grid.desktop --app-category-type=public.app-category.developer-tools --out=../dist --overwrite --prune=true --extra-resource=engine --extra-resource=notices --extra-resource=../THIRD_PARTY_NOTICES.md --extra-resource=../LICENSE --extra-resource=../SAFETY.md --extend-info=build/extra-info.plist --ignore='^/engine($|/)'",
+    "package:linux": "electron-packager . Grid --platform=linux --arch=x64 --out=../dist --overwrite --prune=true",
+    "bundle-engine": "bash build/bundle_engine.sh arm64"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "44.4.5"
+  }
+}

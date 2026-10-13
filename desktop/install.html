@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Grid - installing</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; img-src 'self'">
+<style>
+  :root { color-scheme: dark; --bg:#07090d; --panel:#0d1117; --text:#e6edf3; --muted:#8b97a8; --border:rgba(148,163,184,.14); --accent:#2dd4bf; --code:#0a0e14; }
+  body { margin: 0; min-height: 100vh; background: radial-gradient(800px 480px at 0% -10%, rgba(45,212,191,.10), transparent 60%), linear-gradient(rgba(148,163,184,.045) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(90deg, rgba(148,163,184,.045) 1px, transparent 1px) 0 0/28px 28px, var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, sans-serif; display: grid; place-items: center; }
+  .drag { position: fixed; top: 0; left: 0; right: 0; height: 32px; -webkit-app-region: drag; }
+  main { width: min(560px, 92vw); text-align: center; }
+  img { width: 72px; height: 72px; animation: p 1.6s ease-in-out infinite; } @keyframes p { 50% { opacity: .55; transform: scale(.96); } }
+  h1 { font-size: 19px; margin: 14px 0 4px; }
+  .muted { color: var(--muted); margin: 0 0 18px; }
+  ol { text-align: left; display: inline-block; margin: 0 0 14px; padding-left: 22px; color: var(--muted); }
+  li.on { color: var(--text); font-weight: 600; } li.done { color: var(--accent); }
+  pre { text-align: left; background: var(--code); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; height: 120px; overflow: auto; font: 11.5px Menlo, monospace; white-space: pre-wrap; color: var(--muted); }
+</style></head>
+<body><div class="drag"></div>
+<main>
+  <img src="build/icon.png" alt="">
+  <h1>Setting up Grid</h1>
+  <p class="muted">One-time setup - Grid is installing its engine on this Mac. This needs the internet and takes a minute or two.</p>
+  <ol id="steps"><li>Get Python ready</li><li>Install Grid and its libraries</li><li>Start Grid</li></ol>
+  <pre id="log"></pre>
+</main>
+<script src="install.js"></script>
+</body></html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grid</title>
+<link rel="icon" href="/static/grid-mark.svg">
+<link rel="stylesheet" href="/static/app.css?v=backboard-21">
+<link rel="stylesheet" href="/static/theme.css?v=backboard-21">
+<link rel="stylesheet" href="/static/chat.css?v=backboard-21">
+<link rel="stylesheet" href="/static/studio.css?v=backboard-21">
+<link rel="stylesheet" href="/static/workshop.css?v=backboard-21">
+<link rel="stylesheet" href="/static/particle-lab.css?v=backboard-21">
+</head>
+<body>
+<div id="app" class="app">
+  <aside class="sidebar">
+    <a class="brand" href="#/" title="Home"><img class="logo" src="/static/grid-mark.svg" alt=""><span>Grid</span></a>
+    <div class="side-head"><span>Projects</span>
+      <span class="side-actions">
+        <button class="icon-btn" id="btn-open-folder" title="Open a folder" aria-label="Open a folder"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+        <button class="icon-btn" id="btn-new-project" title="New project" aria-label="New project"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      </span>
+    </div>
+    <nav id="project-list" class="project-list" aria-label="Projects"></nav>
+    <nav class="side-nav" aria-label="App">
+      <a href="#/lab" data-nav="lab" aria-label="Particle Lab" title="Particle Lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(-35 12 12)"/><circle cx="12" cy="12" r="7"/></svg>Lab</a>
+      <a href="#/guide" data-nav="guide" aria-label="Start here" title="Start here"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3zM12 6v16"/></svg>Start here</a>
+      <a href="#/plugins" data-nav="plugins" aria-label="Plugins" title="Plugins"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3v4M15 3v4M7 7h10v4a5 5 0 0 1-10 0V7zM12 16v5"/></svg>Plugins</a>
+      <a href="#/models" data-nav="models" aria-label="Models" title="Models"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>Models</a>
+      <a href="#/schedules" data-nav="schedules" aria-label="Schedules" title="Schedules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Schedules</a>
+      <a href="#/memory" data-nav="memory" aria-label="Memory" title="Memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3A3.5 3.5 0 0 0 6 6.5v.2A3.5 3.5 0 0 0 4 13a3.5 3.5 0 0 0 2 6.3A3 3 0 0 0 12 19V5a2 2 0 0 0-2.5-2zM14.5 3A3.5 3.5 0 0 1 18 6.5v.2A3.5 3.5 0 0 1 20 13a3.5 3.5 0 0 1-2 6.3A3 3 0 0 1 12 19"/></svg>Memory</a>
+      <a href="#/settings" data-nav="settings" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</a>
+    </nav>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+  <main id="main" class="main"></main>
+</div>
+<div id="modal-root"></div>
+<div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+<script type="module" src="/static/app.js?v=backboard-21"></script>
+</body>
+</html>

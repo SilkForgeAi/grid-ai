@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSDownloadsFolderUsageDescription</key>
+  <string>Grid saves documents you ask for (PDFs, Word files) to Downloads, and reads files there when you let it.</string>
+  <key>NSDocumentsFolderUsageDescription</key>
+  <string>Grid opens projects and reads or saves files in Documents when you let it.</string>
+  <key>NSDesktopFolderUsageDescription</key>
+  <string>Grid opens projects and reads or saves files on your Desktop when you let it.</string>
+  <key>NSRemovableVolumesUsageDescription</key>
+  <string>Grid opens projects on external drives when you choose them.</string>
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Grid opens and switches between apps when you ask it to use them.</string>
+  <key>NSNetworkVolumesUsageDescription</key>
+  <string>Grid opens projects on network drives when you choose them.</string>
+</dict>
+</plist>
